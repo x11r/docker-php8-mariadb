@@ -1,0 +1,47 @@
+version: "3"
+services:
+  web:
+    container_name: web
+    image: nginx:1.21-alpine
+    volumes:
+      - ./nginx/template:/etc/nginx/template
+      - ../src:/var/www
+    command: /bin/sh -c "DOLLAR=$$ envsubst < /etc/nginx/template/default.conf > /etc/nginx/conf.d/default.conf; nginx -g 'daemon off;' "
+    environment:
+      TZ: Asia/Tokyo
+      SERVER_APP_NAME: app
+      SERVER_APP_PORT: ${SERVER_APP_PORT}
+    ports:
+      - "${SERVER_WEB_PORT}:80"
+    depends_on:
+      - app
+  app:
+    container_name: app
+    build: ./php
+    volumes:
+      - ../src:/var/www
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+      - ./php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      - ./share:/share
+    working_dir: /var/www
+    environment:
+      TZ: Asia/Tokyo
+    depends_on:
+      - db
+  db:
+    container_name: db
+    image: mariadb:10.9
+    environment: 
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB_NAME}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mariadb-lara09:/var/lib/mysql
+      - ./share:/share
+      - ./mariadb/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+    ports:
+      - "${MYSQL_PORT}:${MYSQL_PORT}"
+
+volumes:
+  mariadb-lara09:
