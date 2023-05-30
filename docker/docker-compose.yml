@@ -1,7 +1,6 @@
 version: "3"
 services:
   web:
-    container_name: web
     image: nginx:1.21-alpine
     volumes:
       - ./nginx/template:/etc/nginx/template
@@ -16,7 +15,6 @@ services:
     depends_on:
       - app
   app:
-    container_name: app
     build: ./php
     volumes:
       - ../src:/var/www
@@ -29,19 +27,19 @@ services:
     depends_on:
       - db
   db:
-    container_name: db
     image: mariadb:10.9
-    environment: 
+    environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DB_NAME}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_TCP_PORT: ${MYSQL_TCP_PORT}
     volumes:
-      - mariadb-lara09:/var/lib/mysql
+      - mariadb-lara10:/var/lib/mysql
       - ./share:/share
-      - ./mariadb/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+#      - ./mariadb/mysql.cnf:/etc/mysql/my.cnf
     ports:
-      - "${MYSQL_PORT}:${MYSQL_PORT}"
+      - "${MYSQL_TCP_PORT}:${MYSQL_TCP_PORT}"
 
 volumes:
-  mariadb-lara09:
+  mariadb-lara10:

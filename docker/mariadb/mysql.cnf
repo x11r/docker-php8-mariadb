@@ -1,5 +1,5 @@
 
 [mysqld]
 
-port = 13309
 
+character-set-server=utf8mb4
